@@ -14,15 +14,14 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
-    "Topic :: Scientific/Engineering :: Bio-physics",
     "Topic :: Scientific/Engineering :: Physics",
     "Intended Audience :: Science/Research",
 ]
 dependencies = [
 ]
 [project.urls]
-"Homepage" = "https://github.com/yourusername/openfret"
-"Bug Tracker" = "https://github.com/yourusername/openfret/issues"
+"Homepage" = "https://github.com/simol-lab/OpenFRET"
+"Bug Tracker" = "https://github.com/simol-lab/OpenFRET/issues"
 
 [tool.setuptools]
 packages = ["openfret"] # Automatically find packages

@@ -5,9 +5,7 @@ This Python library provides tools for reading and writing single-molecule FRET 
 ## Installation
 
 ```bash
-pip install openfret  # If you publish to pypi
-# or
-pip install . # If installing from the local directory
+pip install openfret
 ```
 
 ## Usage

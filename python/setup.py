@@ -11,16 +11,15 @@ setup(
     description="A standardized format for single-molecule FRET data",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/openfret",
+    url="https://github.com/simol-lab/OpenFRET",
     project_urls={
-        "Bug Tracker": "https://github.com/yourusername/openfret/issues",
+        "Bug Tracker": "https://github.com/simol-lab/OpenFRET/issues",
     },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
-        "Topic :: Scientific/Engineering :: Bio-physics",
         "Topic :: Scientific/Engineering :: Physics",
         "Intended Audience :: Science/Research",
     ],
