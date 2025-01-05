@@ -1,0 +1,118 @@
+openapi: 3.0.0
+info:
+  title: OpenFRET Data Format
+  description: A standardized format for single-molecule FRET data
+  version: 1.0.0
+
+components:
+  schemas:
+    Metadata:
+      type: object
+      additionalProperties: true
+      description: User-defined metadata associated with the dataset or trace.
+
+    Channel:
+      type: object
+      required:
+        - channel_type
+        - data
+      properties:
+        channel_type:
+          type: string
+          description: String identifier for the channel (e.g., donor, acceptor, FRET).
+        excitation_wavelength:
+          type: number
+          format: float
+          description: Excitation wavelength in nanometers.
+        emission_wavelength:
+          type: number
+          format: float
+          description: Emission wavelength in nanometers.
+        exposure_time:
+          type: number
+          format: float
+          description: Exposure time per frame in seconds.
+        data:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Intensity values for the channel.
+        metadata: # metadata for each channel
+          $ref: '#/components/schemas/Metadata'
+
+    Trace:
+      type: object
+      required:
+        - channels
+      properties:
+        channels:
+          type: array
+          items:
+            $ref: "#/components/schemas/Channel"
+          description: Array of channel data for this trace.
+        metadata: # metadata for each trace
+          $ref: '#/components/schemas/Metadata'
+          description: User-defined metadata associated with the trace.
+
+    Dataset:
+      type: object
+      required:
+        - title
+        - traces
+      properties:
+        title:
+          type: string
+          description: Title of the experiment or dataset.
+        description:
+          type: string
+          description: Detailed description of the experiment.
+        experiment_type:
+          type: string
+          description: Type of experiment (e.g., 2-Color FRET, 3-Color FRET etc.).
+        authors:
+          type: array
+          items:
+            type: string
+          description: List of authors who conducted the experiment.
+        institution:
+          type: string
+          description: Name of the institution where the experiment was conducted.
+        date:
+          type: string
+          format: date
+          description: Date of the experiment.
+        traces:
+          type: array
+          items:
+            $ref: "#/components/schemas/Trace"
+          description: Array of single-molecule traces.
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+          description: User-defined metadata associated with the dataset.
+        sample_details:
+          type: object
+          description: Details about the sample used in the experiment
+          properties:
+            buffer_conditions:
+              type: string
+              description: Description of buffer used
+            other_details:
+              $ref: '#/components/schemas/Metadata'
+              description: Other sample details
+        instrument_details:
+          type: object
+          description: Details about the instrument used in the experiment
+          properties:
+            microscope:
+              type: string
+              description: Microscope model used
+            laser:
+              type: string
+              description: Laser details
+            detector:
+              type: string
+              description: Detector details
+            other_details:
+              $ref: '#/components/schemas/Metadata'
+              description: Other instrument details

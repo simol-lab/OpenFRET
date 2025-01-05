@@ -1,0 +1,76 @@
+{
+    "title": "My FRET Experiment",
+    "traces": [
+        {
+            "channels": [
+                {
+                    "channel_type": "donor",
+                    "excitation_wavelength": null,
+                    "emission_wavelength": null,
+                    "exposure_time": null,
+                    "data": [
+                        100,
+                        110,
+                        120
+                    ],
+                    "metadata": {}
+                },
+                {
+                    "channel_type": "acceptor",
+                    "excitation_wavelength": null,
+                    "emission_wavelength": null,
+                    "exposure_time": 0.1,
+                    "data": [
+                        20,
+                        30,
+                        40
+                    ],
+                    "metadata": {
+                        "gain": 1.2
+                    }
+                }
+            ],
+            "metadata": {
+                "trace_condition": "high salt"
+            }
+        },
+        {
+            "channels": [
+                {
+                    "channel_type": "donor",
+                    "excitation_wavelength": null,
+                    "emission_wavelength": null,
+                    "exposure_time": null,
+                    "data": [
+                        120,
+                        110,
+                        100
+                    ],
+                    "metadata": {}
+                },
+                {
+                    "channel_type": "acceptor",
+                    "excitation_wavelength": null,
+                    "emission_wavelength": null,
+                    "exposure_time": null,
+                    "data": [
+                        40,
+                        30,
+                        20
+                    ],
+                    "metadata": {}
+                }
+            ],
+            "metadata": {}
+        }
+    ],
+    "metadata": {},
+    "sample_details": {
+        "buffer_conditions": "1xPBS"
+    },
+    "instrument_details": {
+        "microscope": "Olympus IX71"
+    },
+    "description": "FRET experiment on DNA origami",
+    "date": "2024-01-01"
+}
