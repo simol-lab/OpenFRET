@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="openfret",
-    version="0.1.0",
+    version="0.1.1",
     author="Jieming Li",
     author_email="jmli@umich.edu",
     description="A standardized format for single-molecule FRET data",
