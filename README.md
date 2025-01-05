@@ -1,4 +1,3 @@
-```markdown
 # OpenFRET Data Format
 
 This repository provides a standardized format for storing single-molecule FRET (Förster Resonance Energy Transfer) data, along with libraries for reading and writing data in this format across multiple programming languages.
@@ -160,4 +159,4 @@ An example of a valid OpenFRET data structure in JSON format:
 ## Contributing
 
 Contributions to this project are welcome! Please open an issue or submit a pull request.
-```
+
