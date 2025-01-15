@@ -11,14 +11,29 @@ class Metadata(dict):
 
 class Channel:
     """Represents a single data channel."""
-    def __init__(self, channel_type: str, data: List[float], excitation_wavelength: Optional[float] = None,
+    def __init__(self, channel_type: str, data: List[float] = None, excitation_wavelength: Optional[float] = None,
                  emission_wavelength: Optional[float] = None, exposure_time: Optional[float] = None, metadata: Optional[Metadata] = None):
         self.channel_type = channel_type
-        self.data = data
+        self._data = None
+        if data is not None:
+            self.data = data
         self.excitation_wavelength = excitation_wavelength
         self.emission_wavelength = emission_wavelength
         self.exposure_time = exposure_time
         self.metadata = metadata or Metadata()
+        
+    @property
+    def data(self):
+        return self._data
+    
+    @data.setter
+    def data(self,value):
+        if not isinstance(value,list):
+            raise TypeError("data must be a list.")
+        if not all(not isinstance(item,list) for item in value):
+            raise ValueError("data list must be 1-dimensional")
+        self._data = value
+            
 
     def to_dict(self):
         return {
@@ -65,17 +80,16 @@ class Dataset:
     def __init__(self, title: str, traces: List[Trace], description: Optional[str] = None, experiment_type: Optional[str] = None,
                  authors: Optional[List[str]] = None, institution: Optional[str] = None, date: Optional[date] = None, metadata: Optional[Metadata] = None,
                  sample_details: Optional[Dict[str, Any]] = None, instrument_details: Optional[Dict[str, Any]] = None):
-
-        self.title = title
-        self.traces = traces
-        self.description = description
-        self.experiment_type = experiment_type
-        self.authors = authors
-        self.institution = institution
-        self.date = date
-        self.metadata = metadata or Metadata()
-        self.sample_details = sample_details or {}
-        self.instrument_details = instrument_details or {}
+            self.title = title
+            self.traces = traces
+            self.description = description
+            self.experiment_type = experiment_type
+            self.authors = authors
+            self.institution = institution
+            self.date = date
+            self.metadata = metadata or Metadata()
+            self.sample_details = sample_details or {}
+            self.instrument_details = instrument_details or {}
 
     def to_dict(self):
         data = {

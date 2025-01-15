@@ -14,8 +14,8 @@ import numpy as np
 filename = "fret_data.json" # Output file name
 
 # Simulate a 100-frame-long trace as random noise (donor only, no dynamics).
-ch1data = np.random.normal(loc=1000.0,scale=200.0,size=[1,100]).tolist() # Donor, mean intensity = 1000
-ch2data = np.random.normal(loc=0.0,scale=200.0,size=[1,100]).tolist() # Acceptor, mean intensity = 0
+ch1data = np.random.normal(loc=1000.0,scale=200.0,size=100).tolist() # Donor, mean intensity = 1000
+ch2data = np.random.normal(loc=0.0,scale=200.0,size=100).tolist() # Acceptor, mean intensity = 0
 
 # Create Channel objects (keywords optional if order is maintained)
 #   Units for wavelengths:   nm (nanometers)
