@@ -91,7 +91,7 @@ class Trace:
     
     @channels.setter # Validate channel property
     def channels(self,value):
-        if not isinstance(value,Channel) and (not isinstance(value,list)):
+        if (not isinstance(value,Channel)) and (not isinstance(value,list)):
             raise TypeError("channels property must either be a Channel object created with openfret.Channel() or a single, 1-dimensional (non-nested) list of Channel objects")
         if isinstance(value,list):
             if not all(isinstance(item,Channel) for item in value):
@@ -107,10 +107,15 @@ class Trace:
             self._channels = [value] # If a single Channel is provided outside of a list, convert to 1-element list
             print("Warning: Single Channel object was provided for Dataset, and converted to a one-element list")
 
-    def add(self,value): # Controlled method to append channels to a trace
-        if not isinstance(value,Channel):
-            raise TypeError('Only Channel objects can be appended with Trace.add()')
-        self.channels.extend(value)
+    def add(self,value): # Validate and append channels to a trace    
+        if isinstance(value,list):
+            if not all(isinstance(channel,Channel) for channel in Channel):
+                raise ValueError('List passed to Trace.add() must contain only Channel objects')
+            self._channels.extend(value)
+        elif isinstance(value,Channel):
+            self._channels.append(value)
+        else:
+            raise TypeError('Only Channel objects or lists of Channel objects can be appended with Trace.add()')
 
     def to_dict(self):
         return {
