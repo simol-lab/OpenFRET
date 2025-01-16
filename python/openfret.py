@@ -1,11 +1,6 @@
 """Python library for handling the openFRET data format."""
 
-# to do:
-    # Warn user if channels within a trace contain different numbers of frames
-    # Raise error if traces argument for Dataset is not a 1D list of Trace objects
-
 import json
-from warnings import warn
 from datetime import date
 from typing import List, Dict, Any, Optional
 
@@ -31,14 +26,14 @@ class Channel:
     def data(self):
         return self._data
     
-    @data.setter # Validate type and value of data argument
+    @data.setter # Validate type and value of data property
     def data(self,value):
         if not isinstance(value,list):
-            raise TypeError("data must be a list. Please check data argument and ensure it is a 1-D list of type float")
+            raise TypeError("Channel data must be a list. Please check data argument and ensure it is a 1-D list of type float")
         if not all(not isinstance(item,list) for item in value):
-            raise ValueError("data must be a single, 1-dimensional (non-nested) list")
+            raise ValueError("Channel data must be a single, 1-dimensional (non-nested) list")
         if not (all(isinstance(item,float) for item in value) or all(isinstance(item,int) for item in value)):
-            raise ValueError("Contents of data list must numbers of identical type (float or int).")
+            raise ValueError("Contents of Channel data list must be numbers of identical type (float or int).")
         self._data = value
 
     def to_dict(self):
@@ -74,22 +69,23 @@ class Trace:
     def channels(self):
         return self._channels
     
-    @channels.setter # Validate channel argument
+    @channels.setter # Validate channel property
     def channels(self,value):
         if not isinstance(value,Channel) and (not isinstance(value,list)):
-            raise TypeError("channels property must either be a Channel object or a single, 1-dimensional (non-nested) list")
+            raise TypeError("channels property must either be a Channel object created with openfret.Channel() or a single, 1-dimensional (non-nested) list of Channel objects")
         if isinstance(value,list):
             if not all(isinstance(item,Channel) for item in value):
-                raise ValueError("Contents of channels list must be Channel objects.")
+                raise ValueError("Contents of channels list must be Channel objects created with openfret.Channel().")
         if isinstance(value,list):
             channel_lengths = []
             for item in value:
                 channel_lengths.append(len(item.data))
             if len(set(channel_lengths))>1:
-                warn("Channels provided to Trace object are not all of equal length! Please check that this is intended.")
+                print("Warning: Channels provided to Trace object are not all of equal length! Please check that this is intended.")
             self._channels = value
         else:
             self._channels = [value] # If a single Channel is provided outside of a list, convert to 1-element list
+            print("Warning: Single Channel object was provided for Dataset, and converted to a one-element list")
 
     def to_dict(self):
         return {
@@ -106,11 +102,13 @@ class Trace:
 
 class Dataset:
     """Represents a collection of single-molecule traces."""
-    def __init__(self, title: str, traces: List[Trace], description: Optional[str] = None, experiment_type: Optional[str] = None,
+    def __init__(self, title: str, traces: List[Trace] = None, description: Optional[str] = None, experiment_type: Optional[str] = None,
                  authors: Optional[List[str]] = None, institution: Optional[str] = None, date: Optional[date] = None, metadata: Optional[Metadata] = None,
                  sample_details: Optional[Dict[str, Any]] = None, instrument_details: Optional[Dict[str, Any]] = None):
             self.title = title
-            self.traces = traces
+            self._traces = None
+            if traces is not None:
+                self.traces = traces
             self.description = description
             self.experiment_type = experiment_type
             self.authors = authors
@@ -119,6 +117,24 @@ class Dataset:
             self.metadata = metadata or Metadata()
             self.sample_details = sample_details or {}
             self.instrument_details = instrument_details or {}
+            
+    @property
+    def traces(self):
+        return self._traces
+    
+    @traces.setter # Validate traces properties
+    def traces(self,value):
+        if not(isinstance(value,list)) and not(isinstance(value,Trace)): # Check if traces is either a Trace object or list
+            raise TypeError('traces property of Dataset must be a list of Trace objects')
+        if isinstance(value,list): 
+            if any(isinstance(item,list) for item in value): 
+                raise ValueError('List of traces in Dataset must be one-dimensional')
+            elif not(all(isinstance(item,Trace) for item in value)):
+                raise ValueError('List of traces in Dataset must contain only Trace objects created with openfret.Trace()')
+            self._traces = value
+        else:       
+            self._traces = [value] # If traces is a single Trace object, convert to a one-element list
+            print('Warning: Single Trace object was converted to a one-element list')
 
     def to_dict(self):
         data = {

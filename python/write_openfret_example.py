@@ -2,9 +2,6 @@
 """
 Example of creating and writing an OpenFRET data (JSON) file
 
-Created on Wed Jan 15 12:54:14 2025
-
-@author: Leyou Zhang, Alex Johnson-Buck
 """
 
 from openfret import Dataset, Trace, Channel, Metadata, write_data
@@ -17,15 +14,26 @@ filename = "fret_data.json" # Output file name
 ch1data = np.random.normal(loc=1000.0,scale=200.0,size=100).tolist() # Donor, mean intensity = 1000
 ch2data = np.random.normal(loc=0.0,scale=200.0,size=100).tolist() # Acceptor, mean intensity = 0
 
-# Create Channel objects (keywords optional if order is maintained)
+# Create Channel objects to store intensity versus time series for each illumination/detection condition within a trace
+#   Keywords optional if order is maintained
 #   Units for wavelengths:   nm (nanometers)
 #   Units for exposure_time: seconds
 #   data MUST refer to a 1-dimensional list of intensity values (either of type float or int)
-channel1 = Channel(channel_type="donor", data=ch1data, excitation_wavelength=488.0, emission_wavelength=520.0, exposure_time=0.1)
-channel2 = Channel(channel_type="acceptor", data=ch2data, excitation_wavelength=532.0, emission_wavelength=580.0, exposure_time=0.1)
+channel1 = Channel(channel_type="donor", 
+                   data=ch1data, 
+                   excitation_wavelength=488.0, 
+                   emission_wavelength=520.0, 
+                   exposure_time=0.1)
+channel2 = Channel(channel_type="acceptor", 
+                   data=ch2data, 
+                   excitation_wavelength=532.0, 
+                   emission_wavelength=580.0, 
+                   exposure_time=0.1)
 
-# Create a Trace object
-trace1 = Trace([channel1, channel2], metadata=Metadata({"molecule_id": "1"}))
+# Create a Trace object comprising one or more channels
+#   Keywords optional if order is maintained
+#   channels argument must be a 1D list of Channel objects or a single Channel object
+trace1 = Trace(channels=[channel1, channel2], metadata=Metadata({"molecule_id": "1"}))
 
 # Create a Dataset object
 dataset = Dataset(

@@ -2,14 +2,11 @@
 """
 Example of reading an OpenFRET data (JSON) file
 
-Run write_openfret_example.py before this, and make sure the file names match.
-
-@author: Leyou Zhang, Alex Johnson-Buck
 """
 
 from openfret import read_data
 
-filename = "fret_data.json" # Input file name
+filename = "fret_data.json" # Input file name - must point to a valid openFRET .json file
 
 # Read the dataset from a JSON file
 loaded_dataset = read_data(filename)
