@@ -193,6 +193,15 @@ class Dataset:
                     count += 1
                     channel.emission_wavelength = value
         print('Set ' + channel_type + f' emission wavelength for {count} traces')
+        
+    def exposure_time(self, exposure_time: float, channel_type: Optional[str]=''): # Method to set excitation wavelength for all traces in Dataset
+        count = 0
+        for trace in self.traces:
+            for channel in trace.channels:
+                if  len(channel_type)==0 or (len(channel_type)>0 and channel.channel_type == channel_type):
+                    count += 1
+                    channel.exposure_time = exposure_time
+        print('Set ' + channel_type + f' exposure time for {count} channels')
 
     def to_dict(self):
         data = {

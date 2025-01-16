@@ -59,6 +59,7 @@ dataset.excitation_wavelength("donor",532.0)
 dataset.emission_wavelength("donor",585.0)
 dataset.excitation_wavelength("acceptor",640.0)
 dataset.emission_wavelength("acceptor",680.0)
+dataset.exposure_time(0.1)
 
 # Write the dataset to a JSON file
 write_data(dataset, "fret_data.json")
