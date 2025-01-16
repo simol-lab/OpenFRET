@@ -11,7 +11,7 @@ class Metadata(dict):
 
 class Channel:
     """Represents a single data channel."""
-    def __init__(self, channel_type: str, data: List[float] = None, excitation_wavelength: Optional[float] = None,
+    def __init__(self, channel_type: str, data: List[float], excitation_wavelength: Optional[float] = None,
                  emission_wavelength: Optional[float] = None, exposure_time: Optional[float] = None, metadata: Optional[Metadata] = None):
         self.channel_type = channel_type
         self._data = None
@@ -24,17 +24,37 @@ class Channel:
         
     @property
     def data(self):
-        return self._data
+        return self._data.copy()
     
     @data.setter # Validate type and value of data property
     def data(self,value):
         if not isinstance(value,list):
-            raise TypeError("Channel data must be a list. Please check data argument and ensure it is a 1-D list of type float")
+            raise TypeError("Channel data must be a list. Please check data argument and ensure it is a 1-D list of float or int numbers")
         if not all(not isinstance(item,list) for item in value):
             raise ValueError("Channel data must be a single, 1-dimensional (non-nested) list")
         if not (all(isinstance(item,float) for item in value) or all(isinstance(item,int) for item in value)):
             raise ValueError("Contents of Channel data list must be numbers of identical type (float or int).")
         self._data = value
+
+    def add(self,value): # Controlled method to data frames to an existing channel
+        if len(self._data)>0: # If current data is not empty, ensure that data type matches current contents
+            datatype = type(self._data[0])
+            if isinstance(value,list): 
+                if any(not isinstance(frame,datatype) for frame in value):
+                   raise ValueError(f"Elements of list passed to Channel.add() must match the datatype of the original list {datatype}")
+                self._data.extend(value)
+            elif isinstance(value,datatype):
+                self._data.append(value)
+            else:
+                raise TypeError(f"New elements passed to Channel.add() must match the datatype of the original list {datatype}")
+        elif isinstance(value,list):
+            if not(all(isinstance(frame,int) for frame in value) or all(isinstance(frame,float) for frame in value)): 
+                raise ValueError('Elements of list passed to Channel.add() must be of int or float type')
+            self._data.extend(value)
+        elif isinstance(value,int) or isinstance(value,float):
+            self._data.append(value)
+        else:
+            raise TypeError('Channel.add() argument must be an int, float, or list of int or float numbers')
 
     def to_dict(self):
         return {
@@ -67,7 +87,7 @@ class Trace:
         
     @property
     def channels(self):
-        return self._channels
+        return self._channels.copy()
     
     @channels.setter # Validate channel property
     def channels(self,value):
@@ -87,6 +107,11 @@ class Trace:
             self._channels = [value] # If a single Channel is provided outside of a list, convert to 1-element list
             print("Warning: Single Channel object was provided for Dataset, and converted to a one-element list")
 
+    def add(self,value): # Controlled method to append channels to a trace
+        if not isinstance(value,Channel):
+            raise TypeError('Only Channel objects can be appended with Trace.add()')
+        self.channels.extend(value)
+
     def to_dict(self):
         return {
             "channels": [channel.to_dict() for channel in self.channels],
@@ -102,7 +127,7 @@ class Trace:
 
 class Dataset:
     """Represents a collection of single-molecule traces."""
-    def __init__(self, title: str, traces: List[Trace] = None, description: Optional[str] = None, experiment_type: Optional[str] = None,
+    def __init__(self, title: str, traces: List[Trace], description: Optional[str] = None, experiment_type: Optional[str] = None,
                  authors: Optional[List[str]] = None, institution: Optional[str] = None, date: Optional[date] = None, metadata: Optional[Metadata] = None,
                  sample_details: Optional[Dict[str, Any]] = None, instrument_details: Optional[Dict[str, Any]] = None):
             self.title = title
@@ -120,7 +145,7 @@ class Dataset:
             
     @property
     def traces(self):
-        return self._traces
+        return self._traces.copy()
     
     @traces.setter # Validate traces properties
     def traces(self,value):
@@ -135,6 +160,17 @@ class Dataset:
         else:       
             self._traces = [value] # If traces is a single Trace object, convert to a one-element list
             print('Warning: Single Trace object was converted to a one-element list')
+
+    def add(self,value): # Controlled method to append traces to dataset
+        if isinstance(value,Trace):
+            self._traces.append(value)
+        elif isinstance(value,list): 
+            if any(not isinstance(item,Trace) for item in value):
+                raise ValueError('List passed to Dataset.add() contained elements that are not Trace objects')
+            self._traces.extend(value)
+        else:
+            raise TypeError('Dataset.add() argument must be a Trace object or a list of Trace objects')
+        
 
     def to_dict(self):
         data = {

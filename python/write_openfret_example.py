@@ -49,5 +49,10 @@ dataset = Dataset(
     instrument_details={"microscope": "Olympus IX83", "other_details": Metadata({"objective": "60x oil 1.5 NA"})}, #Example of nested metadata
 )
 
+# Create (empty) traces and append them to previously created Dataset (directly using dataset.traces.append() will not work)
+trace2 = Trace(channels=[Channel(channel_type="donor",data=[]),Channel(channel_type="acceptor",data=[])])
+trace3 = Trace(channels=[Channel(channel_type="donor",data=[]),Channel(channel_type="acceptor",data=[])])
+dataset.add([trace2, trace3])
+
 # Write the dataset to a JSON file
 write_data(dataset, "fret_data.json")
