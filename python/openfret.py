@@ -1,6 +1,11 @@
 """Python library for handling the openFRET data format."""
 
+# to do:
+    # Warn user if channels within a trace contain different numbers of frames
+    # Raise error if traces argument for Dataset is not a 1D list of Trace objects
+
 import json
+from warnings import warn
 from datetime import date
 from typing import List, Dict, Any, Optional
 
@@ -29,9 +34,9 @@ class Channel:
     @data.setter # Validate type and value of data argument
     def data(self,value):
         if not isinstance(value,list):
-            raise TypeError("data argument must be a list. Please check data argument and ensure it is a 1-D list of type float")
+            raise TypeError("data must be a list. Please check data argument and ensure it is a 1-D list of type float")
         if not all(not isinstance(item,list) for item in value):
-            raise ValueError("data argument must be a single, 1-dimensional (non-nested) list")
+            raise ValueError("data must be a single, 1-dimensional (non-nested) list")
         if not (all(isinstance(item,float) for item in value) or all(isinstance(item,int) for item in value)):
             raise ValueError("Contents of data list must numbers of identical type (float or int).")
         self._data = value
@@ -60,15 +65,38 @@ class Channel:
 class Trace:
     """Represents a single-molecule trace."""
     def __init__(self, channels: List[Channel], metadata: Optional[Metadata] = None):
-        self.channels = channels
+        self._channels = None
+        if channels is not None:
+            self.channels = channels
         self.metadata = metadata or Metadata()
+        
+    @property
+    def channels(self):
+        return self._channels
+    
+    @channels.setter # Validate channel argument
+    def channels(self,value):
+        if not isinstance(value,Channel) and (not isinstance(value,list)):
+            raise TypeError("channels property must either be a Channel object or a single, 1-dimensional (non-nested) list")
+        if isinstance(value,list):
+            if not all(isinstance(item,Channel) for item in value):
+                raise ValueError("Contents of channels list must be Channel objects.")
+        if isinstance(value,list):
+            channel_lengths = []
+            for item in value:
+                channel_lengths.append(len(item.data))
+            if len(set(channel_lengths))>1:
+                warn("Channels provided to Trace object are not all of equal length! Please check that this is intended.")
+            self._channels = value
+        else:
+            self._channels = [value] # If a single Channel is provided outside of a list, convert to 1-element list
 
     def to_dict(self):
         return {
             "channels": [channel.to_dict() for channel in self.channels],
             "metadata": self.metadata
         }
-
+    
     @classmethod
     def from_dict(cls, data: Dict[str, Any]):
         return cls(
