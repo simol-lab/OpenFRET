@@ -175,7 +175,24 @@ class Dataset:
             self._traces.extend(value)
         else:
             raise TypeError('Dataset.add() argument must be a Trace object or a list of Trace objects')
-        
+    
+    def excitation_wavelength(self, channel_type: str, value: float): # Method to set excitation wavelength for all traces in Dataset
+        count = 0
+        for trace in self.traces:
+            for channel in trace.channels:
+                if channel.channel_type == channel_type:
+                    count += 1   
+                    channel.excitation_wavelength = value
+        print('Set ' + channel_type + f' excitation wavelength for {count} traces')
+    
+    def emission_wavelength(self, channel_type: str, value: float): # Method to set excitation wavelength for all traces in Dataset
+        count = 0
+        for trace in self.traces:
+            for channel in trace.channels:
+                if channel.channel_type == channel_type:
+                    count += 1
+                    channel.emission_wavelength = value
+        print('Set ' + channel_type + f' emission wavelength for {count} traces')
 
     def to_dict(self):
         data = {

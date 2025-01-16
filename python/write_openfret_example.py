@@ -21,13 +21,13 @@ ch2data = np.random.normal(loc=0.0,scale=200.0,size=100).tolist() # Acceptor, me
 #   data MUST refer to a 1-dimensional list of intensity values (either of type float or int)
 channel1 = Channel(channel_type="donor", 
                    data=ch1data, 
-                   excitation_wavelength=488.0, 
-                   emission_wavelength=520.0, 
+                   excitation_wavelength=532.0, 
+                   emission_wavelength=585.0, 
                    exposure_time=0.1)
 channel2 = Channel(channel_type="acceptor", 
                    data=ch2data, 
-                   excitation_wavelength=532.0, 
-                   emission_wavelength=580.0, 
+                   excitation_wavelength=640.0, 
+                   emission_wavelength=680.0, 
                    exposure_time=0.1)
 
 # Create a Trace object comprising one or more channels
@@ -53,6 +53,12 @@ dataset = Dataset(
 trace2 = Trace(channels=[Channel(channel_type="donor",data=[]),Channel(channel_type="acceptor",data=[])])
 trace3 = Trace(channels=[Channel(channel_type="donor",data=[]),Channel(channel_type="acceptor",data=[])])
 dataset.add([trace2, trace3])
+
+# Set excitation and emission wavelengths for all traces in dataset
+dataset.excitation_wavelength("donor",532.0)
+dataset.emission_wavelength("donor",585.0)
+dataset.excitation_wavelength("acceptor",640.0)
+dataset.emission_wavelength("acceptor",680.0)
 
 # Write the dataset to a JSON file
 write_data(dataset, "fret_data.json")
