@@ -20,7 +20,7 @@ ch2data = np.random.normal(loc=0.0,scale=200.0,size=100).tolist() # Acceptor, me
 # Create Channel objects (keywords optional if order is maintained)
 #   Units for wavelengths:   nm (nanometers)
 #   Units for exposure_time: seconds
-#   data should refer to a 1-dimensional list of intensity values
+#   data MUST refer to a 1-dimensional list of intensity values (either of type float or int)
 channel1 = Channel(channel_type="donor", data=ch1data, excitation_wavelength=488.0, emission_wavelength=520.0, exposure_time=0.1)
 channel2 = Channel(channel_type="acceptor", data=ch2data, excitation_wavelength=532.0, emission_wavelength=580.0, exposure_time=0.1)
 

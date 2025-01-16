@@ -26,14 +26,15 @@ class Channel:
     def data(self):
         return self._data
     
-    @data.setter
+    @data.setter # Validate type and value of data argument
     def data(self,value):
         if not isinstance(value,list):
-            raise TypeError("data must be a list.")
+            raise TypeError("data argument must be a list. Please check data argument and ensure it is a 1-D list of type float")
         if not all(not isinstance(item,list) for item in value):
-            raise ValueError("data list must be 1-dimensional")
+            raise ValueError("data argument must be a single, 1-dimensional (non-nested) list")
+        if not (all(isinstance(item,float) for item in value) or all(isinstance(item,int) for item in value)):
+            raise ValueError("Contents of data list must numbers of identical type (float or int).")
         self._data = value
-            
 
     def to_dict(self):
         return {
@@ -132,27 +133,3 @@ def read_data(filename: str) -> Dataset:
         data = json.load(f)
         return Dataset.from_dict(data)
 
-
-if __name__ == "__main__":
-    # Example usage:
-    dataset = Dataset(
-        title="My FRET Experiment",
-        traces=[
-            Trace(channels=[
-                Channel(channel_type="donor", data=[100, 110, 120]),
-                Channel(channel_type="acceptor", data=[20, 30, 40], exposure_time=0.1, metadata={"gain":1.2})
-            ], metadata={"trace_condition":"high salt"}),
-            Trace(channels=[
-                Channel(channel_type="donor", data=[120, 110, 100]),
-                Channel(channel_type="acceptor", data=[40, 30, 20])
-            ])
-        ],
-        description="FRET experiment on DNA origami",
-        date=date(2024, 1, 1),
-        sample_details={"buffer_conditions":"1xPBS"},
-        instrument_details={"microscope":"Olympus IX71"}
-    )
-    
-    write_data(dataset, "fret_data.json")
-    loaded_dataset = read_data("fret_data.json")
-    print(json.dumps(loaded_dataset.to_dict(), indent=4))
