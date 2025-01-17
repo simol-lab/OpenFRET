@@ -36,23 +36,23 @@ class Channel:
             raise ValueError("Contents of Channel data list must be numbers of identical type (float or int).")
         self._data = value
 
-    def add(self,value): # Controlled method to data frames to an existing channel
+    def add(self,frames: List=[]): # Controlled method to data frames to an existing channel
         if len(self._data)>0: # If current data is not empty, ensure that data type matches current contents
             datatype = type(self._data[0])
-            if isinstance(value,list): 
-                if any(not isinstance(frame,datatype) for frame in value):
+            if isinstance(frames,list): 
+                if any(not isinstance(frame,datatype) for frame in frames):
                    raise ValueError(f"Elements of list passed to Channel.add() must match the datatype of the original list {datatype}")
-                self._data.extend(value)
-            elif isinstance(value,datatype):
-                self._data.append(value)
+                self._data.extend(frames)
+            elif isinstance(frames,datatype):
+                self._data.append(frames)
             else:
                 raise TypeError(f"New elements passed to Channel.add() must match the datatype of the original list {datatype}")
-        elif isinstance(value,list):
-            if not(all(isinstance(frame,int) for frame in value) or all(isinstance(frame,float) for frame in value)): 
+        elif isinstance(frames,list):
+            if not(all(isinstance(frame,int) for frame in frames) or all(isinstance(frame,float) for frame in frames)): 
                 raise ValueError('Elements of list passed to Channel.add() must be of int or float type')
-            self._data.extend(value)
-        elif isinstance(value,int) or isinstance(value,float):
-            self._data.append(value)
+            self._data.extend(frames)
+        elif isinstance(frames,int) or isinstance(frames,float):
+            self._data.append(frames)
         else:
             raise TypeError('Channel.add() argument must be an int, float, or list of int or float numbers')
 
@@ -107,13 +107,13 @@ class Trace:
             self._channels = [value] # If a single Channel is provided outside of a list, convert to 1-element list
             print("Warning: Single Channel object was provided for Dataset, and converted to a one-element list")
 
-    def add(self,value): # Validate and append channels to a trace    
-        if isinstance(value,list):
-            if not all(isinstance(channel,Channel) for channel in Channel):
+    def add(self,channels: List[Channel]=[]): # Validate and append channels to a trace    
+        if isinstance(channels,list):
+            if not all(isinstance(channel,Channel) for channel in channels):
                 raise ValueError('List passed to Trace.add() must contain only Channel objects')
-            self._channels.extend(value)
-        elif isinstance(value,Channel):
-            self._channels.append(value)
+            self._channels.extend(channels)
+        elif isinstance(channels,Channel):
+            self._channels.append(channels)
         else:
             raise TypeError('Only Channel objects or lists of Channel objects can be appended with Trace.add()')
 
@@ -166,13 +166,13 @@ class Dataset:
             self._traces = [value] # If traces is a single Trace object, convert to a one-element list
             print('Warning: Single Trace object was converted to a one-element list')
 
-    def add(self,value): # Controlled method to append traces to dataset
-        if isinstance(value,Trace):
-            self._traces.append(value)
-        elif isinstance(value,list): 
-            if any(not isinstance(item,Trace) for item in value):
+    def add(self,traces: List[Trace]=[]): # Controlled method to append traces to dataset
+        if isinstance(traces,Trace):
+            self._traces.append(traces)
+        elif isinstance(traces,list): 
+            if any(not isinstance(item,Trace) for item in traces):
                 raise ValueError('List passed to Dataset.add() contained elements that are not Trace objects')
-            self._traces.extend(value)
+            self._traces.extend(traces)
         else:
             raise TypeError('Dataset.add() argument must be a Trace object or a list of Trace objects')
     
