@@ -6,7 +6,7 @@ Example of reading an OpenFRET data (JSON) file
 
 from openfret import read_data
 
-filename = "fret_data.json" # Input file name - must point to a valid openFRET .json file
+filename = "fret_data.json" # Input file name - must point to a valid openFRET .json file 
 
 # Read the dataset from a JSON file
 loaded_dataset = read_data(filename)

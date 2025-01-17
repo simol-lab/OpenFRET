@@ -2,6 +2,7 @@
 
 import json
 from datetime import date
+import numpy as np
 from typing import List, Dict, Any, Optional
 
 class Metadata(dict):
@@ -26,8 +27,9 @@ class Channel:
     def data(self):
         return self._data.copy()
     
-    @data.setter # Validate type and value of data property
+    @data.setter 
     def data(self,value):
+        ''' Validate data'''
         if not isinstance(value,list):
             raise TypeError("Channel data must be a list. Please check data argument and ensure it is a 1-D list of float or int numbers")
         if not all(not isinstance(item,list) for item in value):
@@ -89,8 +91,9 @@ class Trace:
     def channels(self):
         return self._channels.copy()
     
-    @channels.setter # Validate channel property
+    @channels.setter 
     def channels(self,value):
+        ''' Validate channel '''
         if (not isinstance(value,Channel)) and (not isinstance(value,list)):
             raise TypeError("channels property must either be a Channel object created with openfret.Channel() or a single, 1-dimensional (non-nested) list of Channel objects")
         if isinstance(value,list):
@@ -152,8 +155,9 @@ class Dataset:
     def traces(self):
         return self._traces.copy()
     
-    @traces.setter # Validate traces properties
+    @traces.setter 
     def traces(self,value):
+        ''' Validate traces '''
         if not(isinstance(value,list)) and not(isinstance(value,Trace)): # Check if traces is either a Trace object or list
             raise TypeError('traces property of Dataset must be a list of Trace objects')
         if isinstance(value,list): 
@@ -178,8 +182,8 @@ class Dataset:
     
     def set(self, channel_type: Optional[str] = '', excitation_wavelength: Optional[float] = None, 
             emission_wavelength: Optional[float] = None, exposure_time: Optional[float] = None): 
-        # Method to globally set parameters for each channel type. If channel_type is left blank or set to 'all', 
-        # all channels will be set accordingly.
+        ''' Method to globally set parameters for each channel type. If channel_type is left blank or set to 'all', 
+        all channels will be set accordingly. '''
         count = [0,0,0]
         for trace in self.traces:
             for channel in trace.channels:
@@ -212,7 +216,43 @@ class Dataset:
             print(f'emission_wavelength was set to {emission_wavelength} for {count[1]} {channel_type}channels')
         if exposure_time is not None:
             print(f'exposure_time was set to {exposure_time} for {count[2]} {channel_type}channels')
+        
+    def from_numpy(self,channel_type: str = '',data: np.ndarray = None, traces_in: Optional[str]='rows', 
+                   excitation_wavelength: Optional[float] = None, emission_wavelength: Optional[float] = None, 
+                   exposure_time: Optional[float] = None, metadata: Optional[Metadata] = None):
+        if traces_in == 'cols' or traces_in == 'columns':
+            data = data.T
+        elif traces_in != 'rows':
+            raise ValueError("traces_in must be one of the following strings: 'rows', 'cols', 'columns'")
+        ntraces = len(self.traces)
+        if ntraces == 0:
+            for index in enumerate(data):
+                self.add(Trace(channels=[])) # Populate empty Dataset with empty Trace objects
+        elif ntraces != data.shape[0]:
+            raise ValueError("Dataset must either be empty or contain the same number of traces as the input array. " + f"Input array contains {ntraces} {traces_in} but Dataset has {data.shape[0]} traces.")
+        replace_warning_issued = False
+        for index, row in enumerate(data):
+            row = row.astype(float).tolist()
+            newchannel = Channel(channel_type=channel_type, data=row, excitation_wavelength=excitation_wavelength,
+                              emission_wavelength=emission_wavelength,exposure_time=exposure_time,metadata=metadata)
+            added = False
+            for channel in self.traces[index].channels:
+                if channel.channel_type == channel_type:
+                    channel = newchannel
+                    added = True
+                    if replace_warning_issued == False:
+                        print(f'Warning: some traces already contained a {channel_type} channel; these were replaced.')
+                        replace_warning_issued = True
+            if added == False:
+                self.traces[index].add(newchannel) 
                         
+    def from_csv(self,channel_type: str = '',filename: str = '', traces_in: Optional[str]='rows', 
+                   excitation_wavelength: Optional[float] = None, emission_wavelength: Optional[float] = None, 
+                   exposure_time: Optional[float] = None, metadata: Optional[Metadata] = None):
+        data = np.loadtxt(filename,delimiter=',')
+        self.from_numpy(channel_type=channel_type, data=data, traces_in=traces_in, excitation_wavelength=excitation_wavelength,
+                        emission_wavelength=emission_wavelength, exposure_time=exposure_time, metadata=metadata)
+                    
     def to_dict(self):
         data = {
             "title": self.title,
