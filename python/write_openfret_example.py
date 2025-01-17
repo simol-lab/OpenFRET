@@ -44,8 +44,8 @@ dataset = Dataset(
     authors=["John Doe", "Jane Smith"],
     institution="University X",
     date=date(2024, 1, 1),
-    metadata=Metadata({"experiment_id": "123"}),
-    sample_details={"buffer_conditions": "Phosphate buffer", "other_details": Metadata({"ph": 7.4})}, #Example of nested metadata
+    metadata=Metadata({"experiment_id": "20240101_JD_JS_1", "movie_file": "20240101_CoolExperiment.TIF"}),
+    sample_details={"buffer_conditions": "Phosphate buffer", "other_details": Metadata({"pH": 7.4})}, #Example of nested metadata
     instrument_details={"microscope": "Olympus IX83", "other_details": Metadata({"objective": "60x oil 1.5 NA"})}, #Example of nested metadata
 )
 
@@ -54,12 +54,16 @@ trace2 = Trace(channels=[Channel(channel_type="donor",data=[]),Channel(channel_t
 trace3 = Trace(channels=[Channel(channel_type="donor",data=[]),Channel(channel_type="acceptor",data=[])])
 dataset.add([trace2, trace3])
 
+# Add channel data to empty traces
+trace2.channels[0].data = np.random.normal(loc=1000.0,scale=200.0,size=100).tolist()
+trace2.channels[0].data = np.random.normal(loc=0,scale=200.0,size=100).tolist()
+trace3.channels[1].data = np.random.normal(loc=1000.0,scale=200.0,size=100).tolist()
+trace3.channels[1].data = np.random.normal(loc=0,scale=200.0,size=100).tolist()
+
 # Set excitation and emission wavelengths for all traces in dataset
-dataset.excitation_wavelength("donor",532.0)
-dataset.emission_wavelength("donor",585.0)
-dataset.excitation_wavelength("acceptor",640.0)
-dataset.emission_wavelength("acceptor",680.0)
-dataset.exposure_time(0.1)
+dataset.set(channel_type="donor", excitation_wavelength=532.0, emission_wavelength=585.0)
+dataset.set(channel_type="acceptor", excitation_wavelength=640.0, emission_wavelength=680.0)
+dataset.set(exposure_time=0.1) # Omit channel_type to set parameter for all channels in dataset
 
 # Write the dataset to a JSON file
 write_data(dataset, "fret_data.json")

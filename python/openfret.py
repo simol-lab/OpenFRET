@@ -176,33 +176,43 @@ class Dataset:
         else:
             raise TypeError('Dataset.add() argument must be a Trace object or a list of Trace objects')
     
-    def excitation_wavelength(self, channel_type: str, value: float): # Method to set excitation wavelength for all traces in Dataset
-        count = 0
+    def set(self, channel_type: Optional[str] = '', excitation_wavelength: Optional[float] = None, 
+            emission_wavelength: Optional[float] = None, exposure_time: Optional[float] = None): 
+        # Method to globally set parameters for each channel type. If channel_type is left blank or set to 'all', 
+        # all channels will be set accordingly.
+        count = [0,0,0]
         for trace in self.traces:
             for channel in trace.channels:
-                if channel.channel_type == channel_type:
-                    count += 1   
-                    channel.excitation_wavelength = value
-        print('Set ' + channel_type + f' excitation wavelength for {count} traces')
-    
-    def emission_wavelength(self, channel_type: str, value: float): # Method to set excitation wavelength for all traces in Dataset
-        count = 0
-        for trace in self.traces:
-            for channel in trace.channels:
-                if channel.channel_type == channel_type:
-                    count += 1
-                    channel.emission_wavelength = value
-        print('Set ' + channel_type + f' emission wavelength for {count} traces')
+                if channel_type == '' or channel_type == 'all' or channel.channel_type == channel_type:
+                    if excitation_wavelength is not None:
+                        if type(excitation_wavelength) == float:
+                            channel.excitation_wavelength = excitation_wavelength
+                            count[0] += 1 
+                        else:
+                            raise TypeError(f'excitation_wavelength must be of type float, but an argument of type {type(excitation_wavelength)} was provided.')
+                    if emission_wavelength is not None:
+                        if type(emission_wavelength) == float:
+                            channel.emission_wavelength = emission_wavelength
+                            count[1] += 1
+                        else:
+                            raise TypeError(f'emission_wavelength must be of type float, but an argument of type {type(emission_wavelength)} was provided.')
+                    if exposure_time is not None:
+                        if type(exposure_time) == float:
+                            channel.exposure_time = exposure_time
+                            count[2] += 1 
+                        else:
+                            raise TypeError(f'exposure_time must be of type float, but an argument of type {type(exposure_time)} was provided.')
         
-    def exposure_time(self, exposure_time: float, channel_type: Optional[str]=''): # Method to set excitation wavelength for all traces in Dataset
-        count = 0
-        for trace in self.traces:
-            for channel in trace.channels:
-                if  len(channel_type)==0 or (len(channel_type)>0 and channel.channel_type == channel_type):
-                    count += 1
-                    channel.exposure_time = exposure_time
-        print('Set ' + channel_type + f' exposure time for {count} channels')
-
+        # Summary of what was set
+        if channel_type != '':
+            channel_type = channel_type + ' '
+        if excitation_wavelength is not None:
+            print(f'excitation_wavelength was set to {excitation_wavelength} for {count[0]} {channel_type}channels')
+        if emission_wavelength is not None:
+            print(f'emission_wavelength was set to {emission_wavelength} for {count[1]} {channel_type}channels')
+        if exposure_time is not None:
+            print(f'exposure_time was set to {exposure_time} for {count[2]} {channel_type}channels')
+                        
     def to_dict(self):
         data = {
             "title": self.title,
