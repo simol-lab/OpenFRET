@@ -7,7 +7,8 @@ Example of creating an OpenFRET (JSON) file from CSV files containing trace data
 from openfret import Dataset, Metadata, write_data
 from datetime import date
 
-# Specify filenames of CSVs containing trace data
+# Specify filenames of CSVs containing trace 
+# Note: CSVs must be rectangular; fill in any missing values in CSV with NaN before importing
 donor_filename = 'donor_traces.csv'
 acceptor_filename = 'acceptor_traces.csv'
 
