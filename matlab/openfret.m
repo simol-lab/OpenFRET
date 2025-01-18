@@ -3,7 +3,7 @@ classdef openfret
 
     methods (Static)
 
-        function dataset = read_json(filepath)
+        function dataset = read_data(filepath)
             % Reads a Dataset from a JSON file.
             %
             % Args:
@@ -22,7 +22,7 @@ classdef openfret
 
         end
 
-        function write_json(dataset, filepath)
+        function write_data(dataset, filepath)
             % Writes a Dataset to a JSON file.
             %
             % Args:
