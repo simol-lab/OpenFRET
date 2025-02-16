@@ -15,7 +15,7 @@ The library provides classes for representing the different components of the Op
 ### Writing Data
 
 ```python
-from openfret import Dataset, Trace, Channel, Metadata, write_openfret
+from openfret import Dataset, Trace, Channel, Metadata, write_data
 from datetime import date
 
 # Create Channel objects
@@ -34,35 +34,55 @@ dataset = Dataset(
     authors=["John Doe", "Jane Smith"],
     institution="University X",
     date=date(2024, 1, 1),
-    metadata=Metadata({"experiment_id": "123"}),
+    metadata=Metadata({"experiment_id": "20240101_JD_JS_1", "movie_file": "20240101_CoolExperiment.TIF"}),
     sample_details={"buffer_conditions": "Phosphate buffer", "other_details": Metadata({"ph": 7.4})}, #Example of nested metadata
-    instrument_details={"microscope": "Olympus IX71", "other_details": Metadata({"objective": "60x"})}, #Example of nested metadata
+    instrument_details={"microscope": "Olympus IX83", "other_details": Metadata({"objective": "60x oil 1.5 NA"})}, #Example of nested metadata
 )
 
 # Write the dataset to a JSON file
-write_openfret(dataset, "fret_data.json")
+write_data(dataset, "fret_data.json", compress=True)
 ```
 
 ### Reading Data
 
 ```python
-from openfret import read_openfret
+from openfret import read_data
 
 # Read the dataset from a JSON file
-loaded_dataset = read_openfret("fret_data.json")
+loaded_dataset = read_data("fret_data.json.zip")
 
 # Access data
 print(loaded_dataset.title)
 for trace in loaded_dataset.traces:
     for channel in trace.channels:
         print(f"Channel type: {channel.channel_type}, Data: {channel.data}")
-print(loaded_dataset.sample_details["other_details"]) #Accessing the nested metadata
-print(loaded_dataset.instrument_details["other_details"]) #Accessing the nested metadata
+print(loaded_dataset.sample_details["other_details"])
+print(loaded_dataset.instrument_details["other_details"])
 
 # Or print the whole dictionary
 import json
-print(json.dumps(loaded_dataset.to_dict(), indent=4, default=str)) #added default=str to handle the date object in json output
+print(json.dumps(loaded_dataset.to_dict(), indent=4))
 ```
+
+Loads traces stored in CSV format:
+```python
+import openfret
+root_folder = "fret_data_csv"  # Replace with your root folder path
+dataset = openfret.load_csv_traces(root_folder)
+openfret.write_data(dataset, "fret_data_from_csv.json", compress=True)
+loaded_dataset = openfret.read_data("fret_data_from_csv.json.zip")
+print(json.dumps(loaded_dataset.to_dict(), indent=4))
+ 
+ # Example folder structure:
+ # fret_data_csv/
+ # ├── condition_A/
+ # │   ├── trace1.csv
+ # │   └── trace2.csv
+ # └── condition_B/
+ #     ├── trace3.csv
+ #     └── trace4.csv
+```
+
 
 ## Classes
 
@@ -91,8 +111,9 @@ print(json.dumps(loaded_dataset.to_dict(), indent=4, default=str)) #added defaul
 
 ## Functions
 
-*   **`write_openfret(dataset: Dataset, filename: str)`:** Writes a `Dataset` object to a JSON file.
-*   **`read_openfret(filename: str) -> Dataset`:** Reads a `Dataset` object from a JSON file.
+*   **`write_data(dataset: Dataset, filename: str, compress: bool)`:** Writes a `Dataset` object to a JSON file.
+*   **`read_data(filename: str) -> Dataset`:** Reads a `Dataset` object from a JSON file.
+*   **`load_csv_traces(root_folder: str) -> Dataset`:** Loads a folder of CSV files into a dataset.
 
 ## Contributing
 

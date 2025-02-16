@@ -1,6 +1,9 @@
 """Python library for handling the openFRET data format."""
 
 import json
+import zipfile
+import os
+import numpy as np
 from datetime import date
 from typing import List, Dict, Any, Optional
 
@@ -26,7 +29,7 @@ class Channel:
             "excitation_wavelength": self.excitation_wavelength,
             "emission_wavelength": self.emission_wavelength,
             "exposure_time": self.exposure_time,
-            "data": self.data,
+            "data": np.array(self.data).tolist(),
             "metadata": self.metadata
         }
 
@@ -107,16 +110,30 @@ class Dataset:
             instrument_details=data.get("instrument_details", {})
         )
 
-def write_data(dataset: Dataset, filename: str):
+
+def write_data(dataset: Dataset, filename: str, compress=False):
     """Writes the dataset to a JSON file."""
     with open(filename, "w") as f:
-        json.dump(dataset.to_dict(), f, indent=4)
+        json.dump(dataset.to_dict(), f)
+    if compress:
+        with zipfile.ZipFile(filename + '.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
+            zipf.write(filename, arcname=os.path.basename(filename))
+        os.remove(filename)
+
 
 def read_data(filename: str) -> Dataset:
     """Reads the dataset from a JSON file."""
-    with open(filename, "r") as f:
-        data = json.load(f)
-        return Dataset.from_dict(data)
+    is_zip = filename.endswith('.zip')
+    if is_zip:
+        with zipfile.ZipFile(filename, 'r') as zipf:
+            base_name = os.path.basename(filename.strip('.zip'))
+            with zipf.open(base_name) as f:
+                data = json.load(f)
+                return Dataset.from_dict(data)
+    else:
+        with open(filename, "r") as f:
+            data = json.load(f)
+            return Dataset.from_dict(data)
 
 
 if __name__ == "__main__":
@@ -138,7 +155,7 @@ if __name__ == "__main__":
         sample_details={"buffer_conditions":"1xPBS"},
         instrument_details={"microscope":"Olympus IX71"}
     )
-    
-    write_data(dataset, "fret_data.json")
-    loaded_dataset = read_data("fret_data.json")
+
+    write_data(dataset, "fret_data.json", compress=True)
+    loaded_dataset = read_data("fret_data.json.zip")
     print(json.dumps(loaded_dataset.to_dict(), indent=4))
