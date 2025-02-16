@@ -64,7 +64,7 @@ import json
 print(json.dumps(loaded_dataset.to_dict(), indent=4))
 ```
 
-Loads traces stored in CSV format:
+### Loads traces stored in CSV format
 ```python
 import openfret
 root_folder = "fret_data_csv"  # Replace with your root folder path
