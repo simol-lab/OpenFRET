@@ -3,7 +3,7 @@ classdef openfret
 
     methods (Static)
 
-        function dataset = read(filepath)
+        function dataset = read_data(filepath)
             % Reads a Dataset from a JSON file.
             %
             % Args:
@@ -18,18 +18,18 @@ classdef openfret
                 error('OpenFRET:read:JSONError', 'Error decoding JSON file: %s', ME.message);
             end
 
-            dataset = OpenFRET.validateDataset(data);
+            dataset = openfret.validateDataset(data);
 
         end
 
-        function write(dataset, filepath)
+        function write_data(dataset, filepath)
             % Writes a Dataset to a JSON file.
             %
             % Args:
             %   dataset (struct): The Dataset structure.
             %   filepath (str): Path to the JSON file.
 
-            dataset = OpenFRET.validateDataset(dataset);
+            dataset = openfret.validateDataset(dataset);
             try
                 jsontext = jsonencode(dataset, 'PrettyPrint', true);
                 fid = fopen(filepath, 'w');
