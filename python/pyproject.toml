@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openfret"
-version = "0.1.2"
+version = "0.1.3"
 description = "A standardized format for single-molecule FRET data"
 readme = "README.md"
 authors = [{ name = "Jieming Li, Leyou Zhang", email = "jmli@umich.edu" }, { name = "Leyou Zhang", email = "leyou@umich.edu" }]
@@ -19,7 +19,6 @@ classifiers = [
 ]
 dependencies = [
     "numpy",
-    "csv"
 ]
 [project.urls]
 "Homepage" = "https://github.com/simol-lab/OpenFRET"
