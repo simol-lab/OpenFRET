@@ -18,23 +18,31 @@ classdef openfret
                 error('OpenFRET:read:JSONError', 'Error decoding JSON file: %s', ME.message);
             end
 
-            dataset = OpenFRET.validateDataset(data);
+            dataset = openfret.validateDataset(data);
 
         end
 
-        function write(dataset, filepath)
+        function write(dataset, filepath, varargin)
             % Writes a Dataset to a JSON file.
             %
             % Args:
             %   dataset (struct): The Dataset structure.
             %   filepath (str): Path to the JSON file.
+            %   optional (str): 'compress' to use .zip compression
 
-            dataset = OpenFRET.validateDataset(dataset);
+            dataset = openfret.validateDataset(dataset);
             try
                 jsontext = jsonencode(dataset, 'PrettyPrint', true);
                 fid = fopen(filepath, 'w');
                 fprintf(fid, '%s', jsontext);
                 fclose(fid);
+                if numel(varargin)>0
+                    if strcmpi(varargin{1},'compress')
+                        zipfilename = strcat(filepath,'.zip');
+                        zip(zipfilename,filepath);
+                        delete(filepath);
+                    end
+                end
             catch ME
                 error('OpenFRET:write:JSONError', 'Error encoding or writing JSON file: %s', ME.message);
             end
